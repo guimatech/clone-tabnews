@@ -2,9 +2,9 @@ describe("GET to /api/v1/status", () => {
   let response;
   let responseBody;
   beforeAll(async () => {
-    response = await fetch("http://localhost:3000/api/v1/status");
+    response = await fetch("http://localhost:3001/api/v1/status");
     responseBody = await response.json();
-    return { update_at, dependencies } = responseBody;
+    return ({ update_at, dependencies } = responseBody);
   });
 
   test("should return 200", () => {
@@ -13,16 +13,16 @@ describe("GET to /api/v1/status", () => {
 
   test("should return object containing", () => {
     expect(responseBody).toMatchObject(
-      expect.objectContaining({ 
+      expect.objectContaining({
         update_at: expect.any(String),
         dependencies: {
           database: {
             version: expect.any(String),
             max_connections: expect.any(Number),
-            opened_connections: expect.any(Number)
-          }
-        }
-      })
+            opened_connections: expect.any(Number),
+          },
+        },
+      }),
     );
   });
 
@@ -33,7 +33,7 @@ describe("GET to /api/v1/status", () => {
   });
 
   test("should return `version` equal 16.0", () => {
-    expect(dependencies.database.version).toEqual("16.0")
+    expect(dependencies.database.version).toEqual("16.0");
   });
 
   test("should return `max_connections` equal 100", () => {
@@ -41,11 +41,12 @@ describe("GET to /api/v1/status", () => {
   });
 
   test("should return `opened_connections` equal 1 ", () => {
-    expect(dependencies.database.opened_connections).toBe(1)
+    expect(dependencies.database.opened_connections).toBe(1);
   });
 
   test("should return `max_connections` greater than `opened_connections`", () => {
-    expect(dependencies.database.max_connections)
-      .toBeGreaterThan(dependencies.database.opened_connections);
+    expect(dependencies.database.max_connections).toBeGreaterThan(
+      dependencies.database.opened_connections,
+    );
   });
 });
