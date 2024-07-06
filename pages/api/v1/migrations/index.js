@@ -9,7 +9,7 @@ export default async function migrations(request, response) {
       error: `Method "${request.method}" not allowed`,
     });
   }
-  
+
   let dbClient;
 
   try {
