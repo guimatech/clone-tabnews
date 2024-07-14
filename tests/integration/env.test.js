@@ -1,5 +1,5 @@
 describe(".env", () => {
-  test('should have a "NODE_ENV" equal "test" ', () => {
+  test('should have a "NODE_ENV" equal "test"', () => {
     expect(process.env.NODE_ENV).toBe("test");
   });
   test("should have a postgres host", () => {
