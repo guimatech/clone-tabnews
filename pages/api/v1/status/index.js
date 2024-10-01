@@ -1,7 +1,7 @@
 import database from "infra/database.js";
 
 async function status(request, response) {
-  const updateAt = new Date().toISOString();
+  const updatedAt = new Date().toISOString();
   const databaseVersion = (await database.query("SHOW server_version;")).rows[0]
     .server_version;
   const databaseMaxConnections = (await database.query("SHOW max_connections;"))
@@ -15,7 +15,7 @@ async function status(request, response) {
   ).rows[0].opened_connections;
 
   response.status(200).json({
-    update_at: updateAt,
+    updated_at: updatedAt,
     dependencies: {
       database: {
         version: databaseVersion,
