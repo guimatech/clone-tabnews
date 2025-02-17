@@ -12,7 +12,7 @@ const defaultMigrationOptions = {
 
 async function listPendingMigrations() {
   let dbClient;
-  
+
   try {
     dbClient = await database.getNewClient();
 
