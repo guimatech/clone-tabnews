@@ -2,6 +2,7 @@ import email from "infra/email.js";
 import database from "infra/database.js";
 import webserver from "infra/webserver";
 import { NotFoundError } from "infra/errors.js";
+import user from "models/user";
 
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000; // 15 minutos
@@ -30,30 +31,64 @@ async function create(userId) {
 }
 
 async function findOneValidByToken(tokenId) {
-  const results = await database.query({
-    text: `
-      SELECT
-        *
-      FROM
-        user_activation_tokens
-      WHERE
-        id = $1
-         AND used_at IS NULL
-         AND expires_at > NOW()
-      LIMIT
-        1
-    ;`,
-    values: [tokenId],
-  });
 
-  if (results.rowCount === 0) {
-      throw new NotFoundError({
-        message: "O token de ativação informado não foi encontrado no sistema ou expirou.",
-        action: "Faça um novo cadastro.",
-      });
-    }
+  const token = await runSelectQuery(tokenId);
+  return token;
 
-  return results.rows[0];
+  async function runSelectQuery(tokenId) {
+    const results = await database.query({
+      text: `
+        SELECT
+          *
+        FROM
+          user_activation_tokens
+        WHERE
+          id = $1
+          AND used_at IS NULL
+          AND expires_at > timezone('utc', now())
+        LIMIT
+          1
+      ;`,
+      values: [tokenId],
+    });
+
+    if (results.rowCount === 0) {
+        throw new NotFoundError({
+          message: "O token de ativação informado não foi encontrado no sistema ou expirou.",
+          action: "Faça um novo cadastro.",
+        });
+      }
+
+    return results.rows[0];
+  }
+}
+
+async function markTokenAsUsed(activationTokenId) {
+  const usedActivationToken = runUpdateQuery(activationTokenId);
+  return usedActivationToken;
+
+  async function runUpdateQuery(activationTokenId) {
+    const results = await database.query({
+      text: `
+        UPDATE
+          user_activation_tokens
+        SET
+          used_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      ;`,
+      values: [activationTokenId],
+    });
+
+    return results.rows[0];
+  }
+}
+
+async function activateUserByUserId(userId) {
+  const updatedUser = await user.setFeatures(userId, ["create:session"]);
+  return updatedUser;
 }
 
 async function sendEmailToUser(user, activationToken) {
@@ -73,6 +108,8 @@ Equipe FinTab`,
 const activation = {
   create,
   findOneValidByToken,
+  markTokenAsUsed,
+  activateUserByUserId,
   sendEmailToUser,
 }
 
