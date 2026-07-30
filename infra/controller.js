@@ -7,6 +7,7 @@ import {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
+  ForbiddenError,
 } from "infra/errors.js";
 
 function onNoMatchHandler(request, response) {
@@ -15,7 +16,7 @@ function onNoMatchHandler(request, response) {
 }
 
 function onErrorHandler(error, request, response) {
-  if (error instanceof ValidationError || error instanceof NotFoundError) {
+  if (error instanceof ValidationError || error instanceof NotFoundError || error instanceof ForbiddenError) {
     return response.status(error.statusCode).json(error);
   }
 
@@ -76,6 +77,32 @@ async function injectAuthenticatedUser(request) {
   return request;
 }
 
+async function injectAnonymousUser(request) {
+  const anonymousUserObject = {
+    features: ["read:activation_token", "create:session", "create:user"],
+  };
+  request.context = {
+    ...request.context,
+    user: anonymousUserObject,
+  };
+  return request;
+}
+
+function canRequest(feature) {
+  return function canRequestMiddleware(request, response, next) {
+    const userTryingToRequest = request.context.user;
+
+    if (userTryingToRequest.features.includes(feature)) {
+      return next();
+    }
+
+    throw new ForbiddenError({
+      message: "Você não tem permissão para executar esta ação.",
+      action: `Verifique se o seu usuário possui a feature "${feature}"`,
+    });
+  }
+}
+
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchHandler,
@@ -84,6 +111,7 @@ const controller = {
   setSessionCookie,
   clearSessionCookie,
   injectAnonymousOrUser,
+  canRequest,
 };
 
 export default controller;
