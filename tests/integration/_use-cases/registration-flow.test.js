@@ -12,6 +12,7 @@ beforeAll(async () => {
 
 describe("Use case: Registration Flow (all success)", () => {
   let createUserResponseBody;
+  let createSessionResponseBody;
   let activationTokenId;
 
   test("Create user account", async () => {
@@ -77,7 +78,7 @@ describe("Use case: Registration Flow (all success)", () => {
     expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
 
     const activateUser = await user.findOneByUsername("RegistrationFlow");
-    expect(activateUser.features).toEqual(["create:session"]);
+    expect(activateUser.features).toEqual(["create:session", "read:session"]);
   });
 
   test("Login", async () => {
@@ -97,11 +98,24 @@ describe("Use case: Registration Flow (all success)", () => {
 
     expect(createSessionResponse.status).toBe(201);
 
-    const createSessionResponseBody = await createSessionResponse.json();
+    createSessionResponseBody = await createSessionResponse.json();
 
     expect(createSessionResponseBody.user_id).toBe(createUserResponseBody.id);
   });
 
   test("Get user information", async () => {
+    const userResponse = await fetch(
+      "http://localhost:3000/api/v1/user", {
+        headers: {
+          cookie: `session_id=${createSessionResponseBody.token}`,
+        },
+      }
+    );
+
+    expect(userResponse.status).toBe(200);
+
+    const userResponseBody = await userResponse.json();
+
+    expect(userResponseBody.id).toEqual(createUserResponseBody.id);
   });
 });

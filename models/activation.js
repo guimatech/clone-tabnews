@@ -1,7 +1,11 @@
+import authorization from "models/authorization.js";
 import email from "infra/email.js";
 import database from "infra/database.js";
 import webserver from "infra/webserver";
-import { NotFoundError } from "infra/errors.js";
+import {
+  ForbiddenError,
+  NotFoundError
+} from "infra/errors.js";
 import user from "models/user";
 
 
@@ -64,7 +68,7 @@ async function findOneValidByToken(tokenId) {
 }
 
 async function markTokenAsUsed(activationTokenId) {
-  const usedActivationToken = runUpdateQuery(activationTokenId);
+  const usedActivationToken = await runUpdateQuery(activationTokenId);
   return usedActivationToken;
 
   async function runUpdateQuery(activationTokenId) {
@@ -73,7 +77,8 @@ async function markTokenAsUsed(activationTokenId) {
         UPDATE
           user_activation_tokens
         SET
-          used_at = timezone('utc', now())
+          used_at = timezone('utc', now()),
+          updated_at = timezone('utc', now())
         WHERE
           id = $1
         RETURNING
@@ -87,8 +92,21 @@ async function markTokenAsUsed(activationTokenId) {
 }
 
 async function activateUserByUserId(userId) {
-  const updatedUser = await user.setFeatures(userId, ["create:session"]);
-  return updatedUser;
+  const userToActivate = await user.findOneById(userId);
+
+  if (!authorization.can(userToActivate, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você não pode mais utilizar tokens de ativação.",
+      action: "Entre em contato com o suporte.",
+    });
+  }
+
+  const activatedUser = await user.setFeatures(userId, [
+    "create:session",
+    "read:session"
+  ]);
+
+  return activatedUser;
 }
 
 async function sendEmailToUser(user, activationToken) {
@@ -111,6 +129,7 @@ const activation = {
   markTokenAsUsed,
   activateUserByUserId,
   sendEmailToUser,
+  EXPIRATION_IN_MILLISECONDS,
 }
 
 export default activation;
