@@ -135,7 +135,8 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         const activatedUser = await user.findOneByUsername(createdUser.username);
         expect(activatedUser.features).toEqual([
             "create:session",
-            "read:session"
+            "read:session",
+            "update:user",
         ]);
     });
 
