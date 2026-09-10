@@ -17,7 +17,11 @@ function onNoMatchHandler(request, response) {
 }
 
 function onErrorHandler(error, request, response) {
-  if (error instanceof ValidationError || error instanceof NotFoundError || error instanceof ForbiddenError) {
+  if (
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof ForbiddenError
+  ) {
     return response.status(error.statusCode).json(error);
   }
 
@@ -72,7 +76,7 @@ async function injectAuthenticatedUser(request) {
 
   request.context = {
     ...request.context,
-    user: userObject
+    user: userObject,
   };
 
   return request;
@@ -102,7 +106,7 @@ function canRequest(feature) {
       message: "Você não tem permissão para executar esta ação.",
       action: `Verifique se o seu usuário possui a feature "${feature}"`,
     });
-  }
+  };
 }
 
 const controller = {

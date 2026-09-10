@@ -3,8 +3,8 @@ exports.up = (pgm) => {
     features: {
       type: "varchar[]",
       notNull: true,
-      default: "{}"
-    }
+      default: "{}",
+    },
   });
 };
 

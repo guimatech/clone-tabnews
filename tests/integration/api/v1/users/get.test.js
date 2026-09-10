@@ -21,7 +21,7 @@ describe("GET /api/v1/user", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Você não tem permissão para executar esta ação.",
-        action: "Verifique se o seu usuário possui a feature \"read:session\"",
+        action: 'Verifique se o seu usuário possui a feature "read:session"',
         status_code: 403,
       });
     });
@@ -100,7 +100,7 @@ describe("GET /api/v1/user", () => {
       const createdUser = await orchestrator.createUser({
         username: "UserWithAlmostExpiredSession",
       });
-      
+
       const activatedUser = await orchestrator.activateUser(createdUser);
 
       const sessionObject = await orchestrator.createSession(createdUser.id);

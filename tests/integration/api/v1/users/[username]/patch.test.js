@@ -34,14 +34,14 @@ describe("PATCH /api/v1/users/[username]", () => {
       const responseBody = await response.json();
 
       expect(responseBody).toEqual({
-        "action": "Verifique se o seu usuário possui a feature \"update:user\"",
-        "message": "Você não tem permissão para executar esta ação.",
-        "name": "ForbiddenError",
-        "status_code": 403,
+        action: 'Verifique se o seu usuário possui a feature "update:user"',
+        message: "Você não tem permissão para executar esta ação.",
+        name: "ForbiddenError",
+        status_code: 403,
       });
     });
   }); // End of Anonymous user
-  
+
   describe("Default user", () => {
     test("With nonexistent username", async () => {
       const createdUser = await orchestrator.createUser();
@@ -54,9 +54,9 @@ describe("PATCH /api/v1/users/[username]", () => {
           method: "PATCH",
           headers: {
             Cookie: `session_id=${sessionObject.token}`,
+          },
         },
-      },
-    );
+      );
 
       expect(response.status).toBe(404);
 
@@ -79,7 +79,9 @@ describe("PATCH /api/v1/users/[username]", () => {
         username: "user2",
       });
       const activatedUser2 = await orchestrator.activateUser(createdUser2);
-      const sessionObject2 = await orchestrator.createSession(activatedUser2.id);
+      const sessionObject2 = await orchestrator.createSession(
+        activatedUser2.id,
+      );
 
       const response = await fetch(`http://localhost:3000/api/v1/users/user2`, {
         method: "PATCH",
@@ -113,7 +115,9 @@ describe("PATCH /api/v1/users/[username]", () => {
         username: "userB",
       });
       const activatedUserB = await orchestrator.activateUser(createdUserB);
-      const sessionObjectB = await orchestrator.createSession(activatedUserB.id);
+      const sessionObjectB = await orchestrator.createSession(
+        activatedUserB.id,
+      );
 
       const response = await fetch(`http://localhost:3000/api/v1/users/userA`, {
         method: "PATCH",
@@ -133,7 +137,8 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Você não possui permissão para atualizar outro usuário.",
-        action: "Verifique se o você possui a feature necessária para atualizar outro usuário.",
+        action:
+          "Verifique se o você possui a feature necessária para atualizar outro usuário.",
         status_code: 403,
       });
     });
@@ -147,7 +152,9 @@ describe("PATCH /api/v1/users/[username]", () => {
         email: "email2@outlook.com.br",
       });
       const activatedUser2 = await orchestrator.activateUser(createdUser2);
-      const sessionObject2 = await orchestrator.createSession(activatedUser2.id);
+      const sessionObject2 = await orchestrator.createSession(
+        activatedUser2.id,
+      );
 
       const response = await fetch(
         `http://localhost:3000/api/v1/users/${createdUser2.username}`,
@@ -204,11 +211,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         id: responseBody.id,
         username: "uniqueUser2",
         email: createdUser.email,
-        features: [
-          "create:session",
-          "read:session",
-          "update:user",
-        ],
+        features: ["create:session", "read:session", "update:user"],
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -247,11 +250,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         id: responseBody.id,
         username: createdUser.username,
         email: "uniqueEmail2@outlook.com.br",
-        features: [
-          "create:session",
-          "read:session",
-          "update:user",
-        ],
+        features: ["create:session", "read:session", "update:user"],
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -290,11 +289,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         id: responseBody.id,
         username: createdUser.username,
         email: createdUser.email,
-        features: [
-          "create:session",
-          "read:session",
-          "update:user",
-        ],
+        features: ["create:session", "read:session", "update:user"],
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -325,27 +320,30 @@ describe("PATCH /api/v1/users/[username]", () => {
       const privilegedUser = await orchestrator.createUser();
       const activatedPrivilegedUser =
         await orchestrator.activateUser(privilegedUser);
-      
+
       await orchestrator.addFeatureToUser(activatedPrivilegedUser, [
-        "update:user:others"
+        "update:user:others",
       ]);
 
       const privilegedUserSession = await orchestrator.createSession(
-        activatedPrivilegedUser.id
+        activatedPrivilegedUser.id,
       );
 
       const defaultUser = await orchestrator.createUser();
-      
-      const response = await fetch(`http://localhost:3000/api/v1/users/${defaultUser.username}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `session_id=${privilegedUserSession.token}`,
+
+      const response = await fetch(
+        `http://localhost:3000/api/v1/users/${defaultUser.username}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${privilegedUserSession.token}`,
+          },
+          body: JSON.stringify({
+            username: "AlteradoPorPrivilegiado",
+          }),
         },
-        body: JSON.stringify({
-          username: "AlteradoPorPrivilegiado",
-        }),
-      });
+      );
 
       expect(response.status).toBe(200);
 
@@ -360,7 +358,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
-      
+
       expect(uuidVersion(responseBody.id)).toBe(4);
 
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();

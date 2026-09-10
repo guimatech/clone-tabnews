@@ -13,9 +13,17 @@ router.patch(controller.canRequest("update:user"), patchHandler);
 export default router.handler(controller.errorHandlers);
 
 async function getHandler(request, response) {
+  const userTryingToGet = request.context.user;
   const username = request.query.username;
   const userFound = await user.findOneByUsername(username);
-  return response.status(200).json(userFound);
+
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToGet,
+    "read:user",
+    userFound,
+  );
+
+  return response.status(200).json(secureOutputValues);
 }
 
 async function patchHandler(request, response) {
@@ -28,8 +36,9 @@ async function patchHandler(request, response) {
   if (!authorization.can(userTryingToPatch, "update:user", targetUser)) {
     throw new ForbiddenError({
       message: "Você não possui permissão para atualizar outro usuário.",
-      action: "Verifique se o você possui a feature necessária para atualizar outro usuário.",
-    })
+      action:
+        "Verifique se o você possui a feature necessária para atualizar outro usuário.",
+    });
   }
 
   const userUpdated = await user.update(username, userInputValues);
