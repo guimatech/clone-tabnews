@@ -42,5 +42,12 @@ async function patchHandler(request, response) {
   }
 
   const userUpdated = await user.update(username, userInputValues);
-  return response.status(200).json(userUpdated);
+
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToPatch,
+    "read:user",
+    userUpdated,
+  );
+  
+  return response.status(200).json(secureOutputValues);
 }
