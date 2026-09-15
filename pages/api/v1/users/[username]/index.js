@@ -48,6 +48,6 @@ async function patchHandler(request, response) {
     "read:user",
     userUpdated,
   );
-  
+
   return response.status(200).json(secureOutputValues);
 }

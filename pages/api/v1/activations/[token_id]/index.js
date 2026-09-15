@@ -11,7 +11,7 @@ router.patch(controller.canRequest("read:activation_token"), patchHandler);
 export default router.handler(controller.errorHandlers);
 
 async function patchHandler(request, response) {
-  const userTryingToPatch= request.context.user;
+  const userTryingToPatch = request.context.user;
   const activationTokenId = request.query.token_id;
 
   const validActivationToken =
