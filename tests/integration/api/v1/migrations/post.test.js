@@ -24,7 +24,7 @@ describe("POST /api/v1/migrations", () => {
           name: "ForbiddenError",
           message: "Você não tem permissão para executar esta ação.",
           action:
-            'Verifique se o seu usuário possui a feature "create:migrations"',
+            'Verifique se o seu usuário possui a feature "create:migration"',
           status_code: 403,
         });
       });
@@ -57,7 +57,7 @@ describe("POST /api/v1/migrations", () => {
           name: "ForbiddenError",
           message: "Você não tem permissão para executar esta ação.",
           action:
-            'Verifique se o seu usuário possui a feature "create:migrations"',
+            'Verifique se o seu usuário possui a feature "create:migration"',
           status_code: 403,
         });
       });
@@ -65,11 +65,11 @@ describe("POST /api/v1/migrations", () => {
   });
 
   describe("Privileged user", () => {
-    describe("With `create:migrations`", () => {
+    describe("With `create:migration`", () => {
       test("For the first time", async () => {
         const createdUser = await orchestrator.createUser();
         const activatedUser = await orchestrator.activateUser(createdUser);
-        await orchestrator.addFeatureToUser(createdUser, ["create:migrations"]);
+        await orchestrator.addFeatureToUser(createdUser, ["create:migration"]);
         const sessionObject = await orchestrator.createSession(
           activatedUser.id,
         );

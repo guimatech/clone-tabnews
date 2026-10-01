@@ -17,7 +17,7 @@ describe("GET /api/v1/migrations", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Você não tem permissão para executar esta ação.",
-        action: 'Verifique se o seu usuário possui a feature "read:migrations"',
+        action: 'Verifique se o seu usuário possui a feature "read:migration"',
         status_code: 403,
       });
     });
@@ -41,17 +41,17 @@ describe("GET /api/v1/migrations", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Você não tem permissão para executar esta ação.",
-        action: 'Verifique se o seu usuário possui a feature "read:migrations"',
+        action: 'Verifique se o seu usuário possui a feature "read:migration"',
         status_code: 403,
       });
     });
   });
 
   describe("Privileged user", () => {
-    test("With `read:migrations`", async () => {
+    test("With `read:migration`", async () => {
       const createdUser = await orchestrator.createUser();
       const activatedUser = await orchestrator.activateUser(createdUser);
-      await orchestrator.addFeatureToUser(createdUser, ["read:migrations"]);
+      await orchestrator.addFeatureToUser(createdUser, ["read:migration"]);
       const sessionObject = await orchestrator.createSession(activatedUser.id);
 
       const response = await fetch("http://localhost:3000/api/v1/migrations", {
