@@ -108,15 +108,15 @@ async function activateUserByUserId(userId) {
 
 async function sendEmailToUser(user, activationToken) {
   await email.send({
-    from: "FinTab <contato@fintab.com.br>",
+    from: "Lucas Guimarães <contato@guimaraes-lucas.com.br>",
     to: user.email,
-    subject: "Ative seu cadastro no FinTab!",
-    text: `${user.username}, clique no link abaixo para ativar seu cadastro no FinTab:
+    subject: "Ative seu cadastro no Lucas Guimarães!",
+    text: `${user.username}, clique no link abaixo para ativar seu cadastro no Lucas Guimarães:
 
 ${webserver.origin}/cadastro/ativar/${activationToken.id}
 
 Atenciosamente,
-Equipe FinTab`,
+Equipe Lucas Guimarães`,
   });
 }
 
