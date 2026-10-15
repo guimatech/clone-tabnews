@@ -131,7 +131,7 @@ describe("POST /api/v1/sessions", () => {
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-       // `expires_at` é calculado na aplicação antes da persistência.
+      // `expires_at` é calculado na aplicação antes da persistência.
       // `created_at` é calculado depois na camada do banco de dados.
       // Por isso, o tempo real entre as duas datas pode ficar ligeiramente
       // menor do que o tempo de expiração configurado e não bater 30 dias nos
