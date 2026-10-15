@@ -1,4 +1,5 @@
 import orchestrator from "tests/orchestrator.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -10,7 +11,7 @@ describe("PUT /api/v1/migrations", () => {
     describe("Running pending migrations", () => {
       test("For the first time", async () => {
         const response = await fetch(
-          "http://localhost:3000/api/v1/migrations",
+          `${webserver.origin}/api/v1/migrations`,
           {
             method: "PUT",
           },

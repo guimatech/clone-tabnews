@@ -1,4 +1,5 @@
 import orchestrator from "tests/orchestrator.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -11,7 +12,7 @@ describe("POST /api/v1/migrations", () => {
     describe("Running pending migrations", () => {
       test("For the first time", async () => {
         const response1 = await fetch(
-          "http://localhost:3000/api/v1/migrations",
+          `${webserver.origin}/api/v1/migrations`,
           {
             method: "POST",
           },
@@ -41,7 +42,7 @@ describe("POST /api/v1/migrations", () => {
         );
 
         const response1 = await fetch(
-          "http://localhost:3000/api/v1/migrations",
+          `${webserver.origin}/api/v1/migrations`,
           {
             method: "POST",
             headers: {
@@ -75,7 +76,7 @@ describe("POST /api/v1/migrations", () => {
         );
 
         const response1 = await fetch(
-          "http://localhost:3000/api/v1/migrations",
+          `${webserver.origin}/api/v1/migrations`,
           {
             method: "POST",
             headers: {
