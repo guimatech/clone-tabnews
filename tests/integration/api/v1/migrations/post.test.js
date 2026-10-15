@@ -38,7 +38,7 @@ describe("POST /api/v1/migrations", () => {
         const createdUser = await orchestrator.createUser();
         const activatedUser = await orchestrator.activateUser(createdUser);
         const sessionObject = await orchestrator.createSession(
-          activatedUser.id,
+          activatedUser,
         );
 
         const response1 = await fetch(
@@ -72,7 +72,7 @@ describe("POST /api/v1/migrations", () => {
         const activatedUser = await orchestrator.activateUser(createdUser);
         await orchestrator.addFeatureToUser(createdUser, ["create:migration"]);
         const sessionObject = await orchestrator.createSession(
-          activatedUser.id,
+          activatedUser
         );
 
         const response1 = await fetch(
